@@ -1,0 +1,29 @@
+name: Rotate Background
+
+permissions:
+  contents: write
+  
+on:
+  schedule:
+    - cron: '*/10 * * * *'
+  workflow_dispatch: 
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Run randomization script
+      run: |
+        chmod +x randomize.sh
+        ./randomize.sh
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add current-bg.jpg
+        # Проверяем, изменилась ли картинка, чтобы не делать пустых коммитов
+        git diff --quiet && git diff --staged --quiet || (git commit -m "Rotate background Image" && git push)
